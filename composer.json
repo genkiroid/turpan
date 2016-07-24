@@ -1,0 +1,20 @@
+{
+    "name": "genkiroid/turpan",
+    "description": "Parse PHP a little.",
+    "require": {
+        "gitonomy/gitlib": "~1.0",
+        "nikic/php-parser": "~2.1"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "genkiroid",
+            "email": "gamurai@gmail.com"
+        }
+    ],
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    }
+}
