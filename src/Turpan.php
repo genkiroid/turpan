@@ -8,7 +8,7 @@ use PhpParser\PrettyPrinter;
 
 class Turpan
 {
-    const VERSION = '0.1.1';
+    const VERSION = '0.1.2';
 
     const INCLUDE_STMT_PATTERN = '/^( *)(include_once|include|require_once|require)(\((?P<required_file_1>.*)\)| +(?P<required_file_2>.*));( *)$/';
 
@@ -132,6 +132,7 @@ class Turpan
         $failCnt = 0;
 
         foreach ($map as $m) {
+            chdir(dirname($m['file']));
             $requiredPath = eval('return ' . $m['required_file'] . ';');
             $requiredContent = file_get_contents($requiredPath);
 
