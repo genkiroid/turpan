@@ -8,7 +8,7 @@ use PhpParser\PrettyPrinter;
 
 class Turpan
 {
-    const VERSION = '0.2.0';
+    const VERSION = '0.2.1';
 
     const INCLUDE_STMT_PATTERN = '/^( *)(include_once|include|require_once|require)(\((?P<required_file_1>.*)\)| +(?P<required_file_2>.*));( *)$/';
 
@@ -166,6 +166,7 @@ class Turpan
     /**
      * report
      *
+     * @param array $results Array of Genkiroid\Turpan\Result
      * @return void
      */
     public static function report(array $results)
