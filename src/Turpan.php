@@ -8,7 +8,7 @@ use PhpParser\PrettyPrinter;
 
 class Turpan
 {
-    const VERSION = '0.1.3';
+    const VERSION = '0.2.0';
 
     const INCLUDE_STMT_PATTERN = '/^( *)(include_once|include|require_once|require)(\((?P<required_file_1>.*)\)| +(?P<required_file_2>.*));( *)$/';
 
@@ -117,96 +117,60 @@ class Turpan
     }
 
     /**
-     * report
+     * test
      *
      * @param array $map
-     * @return void
+     * @return array of Genkiroid\Turpan\Result
      */
-    public static function report(array $map)
+    public static function test(array $map)
     {
-        printf("genkiroid/Turpan version %s\n\n", self::VERSION);
+        printf("genkiroid/Turpan version %s\n\n", Turpan::VERSION);
 
         $parser = (new ParserFactory)->create(ParserFactory::ONLY_PHP5);
-        $result = [];
-        $passCnt = 0;
-        $failCnt = 0;
-        $errCnt = 0;
+        $results = [];
 
         foreach ($map as $m) {
             chdir(dirname($m['file']));
             $requiredPath = eval('return ' . $m['required_file'] . ';');
             if (is_readable($requiredPath) === false) {
                 echo "\033[34mE\033[0m";
-                $errCnt++;
-                $result[] = new Turpan\Result(
+                $results[] = new Turpan\Result(
                     Turpan\Result::ERROR,
                     "{$m['file']} requires \33[33m{$m['required_file']}\033[0m, but it was not readable."
                 );
                 continue;
             }
-            $requiredContent = file_get_contents($requiredPath);
 
+            $requiredContent = file_get_contents($requiredPath);
             $nodes = $parser->parse($requiredContent);
 
             if (self::isPureClassFile($nodes)) {
                 echo "\033[32m.\033[0m";
-                $passCnt++;
-                $result[] = new Turpan\Result(
+                $results[] = new Turpan\Result(
                     Turpan\Result::PASS,
                     "{$requiredPath} is pure class file."
                 );
             } else {
                 echo "\033[31mF\033[0m";
-                $failCnt++;
-                $result[] = new Turpan\Result(
+                $results[] = new Turpan\Result(
                     Turpan\Result::FAIL,
                     "{$requiredPath} is not pure class file.",
                     self::getDeniedNode($nodes)
                 );
             }
         }
-        echo PHP_EOL, PHP_EOL;
 
-        $totalCnt = $passCnt + $failCnt + $errCnt;
+        return $results;
+    }
 
-        echo "Total: {$totalCnt}\n";
-        echo "Pass:  {$passCnt}\n";
-        echo "Fail:  {$failCnt}\n";
-        echo "Error: {$errCnt}\n";
-
-        echo PHP_EOL;
-
-        echo "Failure details:\n\n";
-
-        $i = 1;
-        foreach ($result as $r) {
-            if ($r->getResult() === Turpan\Result::FAIL) {
-                echo <<<EOT
-{$i}) {$r->getMessage()} See the code bellow.
-\033[35m
-{$r->getContent()}
-\033[0m
-
-
-EOT;
-                $i++;
-            }
-        }
-
-        echo PHP_EOL;
-
-        echo "Error details:\n\n";
-
-        $i = 1;
-        foreach ($result as $r) {
-            if ($r->getResult() === Turpan\Result::ERROR) {
-                echo <<<EOT
-{$i}) {$r->getMessage()}
-
-EOT;
-                $i++;
-            }
-        }
+    /**
+     * report
+     *
+     * @return void
+     */
+    public static function report(array $results)
+    {
+        (new Turpan\Report($results))->output();
     }
 
     /**
@@ -220,11 +184,13 @@ EOT;
     public static function reportRemovedIncludeNodePointsOnlyAllowedContent($repoPath, $revFrom, $revTo)
     {
         Turpan::report(
-            Turpan::getRequiredFileMap(
-                Turpan::getChangedFiles(
-                    Turpan::getRepo($repoPath),
-                    $revFrom,
-                    $revTo
+            Turpan::test(
+                Turpan::getRequiredFileMap(
+                    Turpan::getChangedFiles(
+                        Turpan::getRepo($repoPath),
+                        $revFrom,
+                        $revTo
+                    )
                 )
             )
         );
