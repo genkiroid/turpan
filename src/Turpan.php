@@ -8,7 +8,7 @@ use PhpParser\PrettyPrinter;
 
 class Turpan
 {
-    const VERSION = '0.1.2';
+    const VERSION = '0.1.3';
 
     const INCLUDE_STMT_PATTERN = '/^( *)(include_once|include|require_once|require)(\((?P<required_file_1>.*)\)| +(?P<required_file_2>.*));( *)$/';
 
@@ -130,10 +130,20 @@ class Turpan
         $result = [];
         $passCnt = 0;
         $failCnt = 0;
+        $errCnt = 0;
 
         foreach ($map as $m) {
             chdir(dirname($m['file']));
             $requiredPath = eval('return ' . $m['required_file'] . ';');
+            if (is_readable($requiredPath) === false) {
+                echo "\033[34mE\033[0m";
+                $errCnt++;
+                $result[] = new Turpan\Result(
+                    Turpan\Result::ERROR,
+                    "{$m['file']} requires \33[33m{$m['required_file']}\033[0m, but it was not readable."
+                );
+                continue;
+            }
             $requiredContent = file_get_contents($requiredPath);
 
             $nodes = $parser->parse($requiredContent);
@@ -141,24 +151,32 @@ class Turpan
             if (self::isPureClassFile($nodes)) {
                 echo "\033[32m.\033[0m";
                 $passCnt++;
-                $result[] = new Turpan\Result(Turpan\Result::PASS, $requiredPath);
+                $result[] = new Turpan\Result(
+                    Turpan\Result::PASS,
+                    "{$requiredPath} is pure class file."
+                );
             } else {
                 echo "\033[31mF\033[0m";
                 $failCnt++;
-                $result[] = new Turpan\Result(Turpan\Result::FAIL, $requiredPath, self::getDeniedNode($nodes));
+                $result[] = new Turpan\Result(
+                    Turpan\Result::FAIL,
+                    "{$requiredPath} is not pure class file.",
+                    self::getDeniedNode($nodes)
+                );
             }
         }
         echo PHP_EOL, PHP_EOL;
 
-        $totalCnt = $passCnt + $failCnt;
+        $totalCnt = $passCnt + $failCnt + $errCnt;
 
         echo "Total: {$totalCnt}\n";
         echo "Pass:  {$passCnt}\n";
         echo "Fail:  {$failCnt}\n";
+        echo "Error: {$errCnt}\n";
 
         echo PHP_EOL;
 
-        echo "Fail details:\n\n";
+        echo "Failure details:\n\n";
 
         $i = 1;
         foreach ($result as $r) {
@@ -169,6 +187,21 @@ class Turpan
 {$r->getContent()}
 \033[0m
 
+
+EOT;
+                $i++;
+            }
+        }
+
+        echo PHP_EOL;
+
+        echo "Error details:\n\n";
+
+        $i = 1;
+        foreach ($result as $r) {
+            if ($r->getResult() === Turpan\Result::ERROR) {
+                echo <<<EOT
+{$i}) {$r->getMessage()}
 
 EOT;
                 $i++;

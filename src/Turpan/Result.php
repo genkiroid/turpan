@@ -5,6 +5,7 @@ class Result
 {
     const PASS = 0;
     const FAIL = 1;
+    const ERROR = 2;
 
     /**
      * __construct
@@ -14,22 +15,11 @@ class Result
      * @param string $content
      * @return void
      */
-    public function __construct($result, $path, $content = '')
+    public function __construct($result, $message, $content = '')
     {
         $this->result = $result;
-        $this->path = $path;
+        $this->message = $message;
         $this->content = $content;
-
-        switch ($result) {
-        case Result::PASS:
-            $this->message = "{$path} is pure class file.";
-            break;
-        case Result::FAIL:
-            $this->message = "{$path} is not pure class file.";
-            break;
-        default:
-            throw new Exception('unknown result code.');
-        }
     }
 
     /**
