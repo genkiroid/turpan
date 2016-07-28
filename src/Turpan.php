@@ -8,7 +8,7 @@ use PhpParser\PrettyPrinter;
 
 class Turpan
 {
-    const VERSION = '0.2.1';
+    const VERSION = '0.2.2';
 
     const INCLUDE_STMT_PATTERN = '/^( *)(include_once|include|require_once|require)(\((?P<required_file_1>.*)\)| +(?P<required_file_2>.*));( *)$/';
 
@@ -77,6 +77,7 @@ class Turpan
     {
         switch ($node->getType()) {
         case 'Stmt_Class':
+        case 'Stmt_Interface':
         case 'Expr_Include':
             return true;
             break;
@@ -154,7 +155,7 @@ class Turpan
                 echo "\033[31mF\033[0m";
                 $results[] = new Turpan\Result(
                     Turpan\Result::FAIL,
-                    "{$requiredPath} is not pure class file.",
+                    "{$m['file']} requires \33[33m{$m['required_file']}\033[0m, but it was not pure class file.",
                     self::getDeniedNode($nodes)
                 );
             }
