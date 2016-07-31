@@ -98,11 +98,13 @@ class Report
 
         $i = 1;
         foreach ($fail as $result) {
+            $detail = '';
+            if (getenv('TURPAN_SHOW_DETAIL') !== 'OFF') {
+                $detail = "See the code bellow.\n\n";
+                $detail .= "\033[35m{$result->getContent()}\033[0m";
+            }
             echo <<<EOT
-{$i}) {$result->getMessage()} See the code bellow.
-\033[35m
-{$result->getContent()}
-\033[0m
+{$i}) {$result->getMessage()} {$detail}
 
 
 EOT;
@@ -115,6 +117,7 @@ EOT;
         foreach ($error as $result) {
             echo <<<EOT
 {$i}) {$result->getMessage()}
+
 
 EOT;
             $i++;
