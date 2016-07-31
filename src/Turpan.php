@@ -8,7 +8,7 @@ use PhpParser\PrettyPrinter;
 
 class Turpan
 {
-    const VERSION = '0.2.2';
+    const VERSION = '0.2.3';
 
     const INCLUDE_STMT_PATTERN = '/^( *)(include_once|include|require_once|require)(\((?P<required_file_1>.*)\)| +(?P<required_file_2>.*));( *)$/';
 
@@ -52,7 +52,7 @@ class Turpan
                 $lines = $change->getLines();
                 foreach ($lines as $data) {
                     list($type, $line) = $data;
-                    if ($type === FileChange::LINE_REMOVE) {
+                    if ($type === FileChange::LINE_ADD || $type === FileChange::LINE_REMOVE) {
                         $isMatch = preg_match(Turpan::INCLUDE_STMT_PATTERN, $line, $matches);
                         if (!$isMatch) { continue; }
 
@@ -137,7 +137,7 @@ class Turpan
                 echo "\033[34mE\033[0m";
                 $results[] = new Turpan\Result(
                     Turpan\Result::ERROR,
-                    "{$m['file']} requires \33[33m{$m['required_file']}\033[0m, but it was not readable."
+                    "{$m['file']} requires \33[33m{$m['required_file']}\033[0m, but it is not readable."
                 );
                 continue;
             }
@@ -155,7 +155,7 @@ class Turpan
                 echo "\033[31mF\033[0m";
                 $results[] = new Turpan\Result(
                     Turpan\Result::FAIL,
-                    "{$m['file']} requires \33[33m{$m['required_file']}\033[0m, but it was not pure class file.",
+                    "{$m['file']} requires \33[33m{$m['required_file']}\033[0m, but it is not pure class file.",
                     self::getDeniedNode($nodes)
                 );
             }
@@ -176,14 +176,14 @@ class Turpan
     }
 
     /**
-     * reportRemovedIncludeNodePointsOnlyAllowedContent
+     * reportModifiedIncludeNodePointsOnlyAllowedContent
      *
      * @param string $repoPath
      * @param string $revFrom
      * @param string $revTo
      * @return void
      */
-    public static function reportRemovedIncludeNodePointsOnlyAllowedContent($repoPath, $revFrom, $revTo)
+    public static function reportModifiedIncludeNodePointsOnlyAllowedContent($repoPath, $revFrom, $revTo)
     {
         Turpan::report(
             Turpan::test(
