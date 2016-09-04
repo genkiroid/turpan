@@ -8,7 +8,7 @@ use PhpParser\PrettyPrinter;
 
 class Turpan
 {
-    const VERSION = '0.2.4';
+    const VERSION = '0.2.5';
 
     const INCLUDE_STMT_PATTERN = '/^( *)(include_once|include|require_once|require)(\((?P<required_file_1>.*)\)| +(?P<required_file_2>.*));( *)$/';
 
@@ -131,7 +131,10 @@ class Turpan
         $results = [];
 
         foreach ($map as $m) {
-            chdir(dirname($m['file']));
+            if (file_exists(dirname($m['file']))) {
+                chdir(dirname($m['file']));
+            }
+
             $requiredPath = eval('return ' . $m['required_file'] . ';');
             if (is_readable($requiredPath) === false) {
                 echo "\033[34mE\033[0m";
