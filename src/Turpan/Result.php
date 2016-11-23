@@ -1,5 +1,5 @@
 <?php
-namespace Genkiroid\Turpan;
+namespace Turpan;
 
 class Result
 {

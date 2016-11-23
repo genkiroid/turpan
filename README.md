@@ -10,9 +10,9 @@ error_reporting(E_ALL && ~E_NOTICE);
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
-use Genkiroid\Turpan;
+use Turpan\Turpan;
 
-Turpan::reportModifiedIncludeNodePointsOnlyAllowedContent(
+Turpan::run(
     dirname(__DIR__),                             //git repository path
     '1378949ebd23108b12bb0491f8e17684d142a285',   //commit from
     '1826b68b66782d4920e0bfdeefd54a84aa0eb5e0'    //commit to

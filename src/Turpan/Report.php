@@ -1,5 +1,5 @@
 <?php
-namespace Genkiroid\Turpan;
+namespace Turpan;
 
 class Report
 {
@@ -44,8 +44,8 @@ class Report
     /**
      * addResult
      *
-     * @param Genkiroid\Turpan\Result $result
-     * @return Genkiroid\Turpan\Report
+     * @param Result $result
+     * @return Report
      */
     public function addResult(Result $result)
     {

@@ -1,5 +1,5 @@
 <?php
-namespace Genkiroid;
+namespace Turpan;
 
 use Gitonomy\Git\Repository;
 use Gitonomy\Git\Diff\FileChange;
@@ -8,7 +8,7 @@ use PhpParser\PrettyPrinter;
 
 class Turpan
 {
-    const VERSION = '0.2.5';
+    const VERSION = '0.2.6';
 
     const INCLUDE_STMT_PATTERN = '/^( *)(include_once|include|require_once|require)(\((?P<required_file_1>.*)\)| +(?P<required_file_2>.*));( *)$/';
 
@@ -31,7 +31,7 @@ class Turpan
      * @param string $revTo
      * @return array
      */
-    public static function getChangedFiles(\Gitonomy\Git\Repository $repo, $revFrom, $revTo)
+    public static function getChangedFiles(Repository $repo, $revFrom, $revTo)
     {
         return $repo->getDiff("{$revFrom}..{$revTo}")->getFiles();
     }
@@ -121,11 +121,11 @@ class Turpan
      * test
      *
      * @param array $map
-     * @return array of Genkiroid\Turpan\Result
+     * @return array of Result
      */
     public static function test(array $map)
     {
-        printf("genkiroid/Turpan version %s\n\n", Turpan::VERSION);
+        printf("genkiroid/Turpan version %s\n\n", self::VERSION);
 
         $parser = (new ParserFactory)->create(ParserFactory::ONLY_PHP5);
         $results = [];
@@ -138,8 +138,8 @@ class Turpan
             $requiredPath = eval('return ' . $m['required_file'] . ';');
             if (is_readable($requiredPath) === false) {
                 echo "\033[34mE\033[0m";
-                $results[] = new Turpan\Result(
-                    Turpan\Result::ERROR,
+                $results[] = new Result(
+                    Result::ERROR,
                     "{$m['file']} requires \33[33m{$m['required_file']}\033[0m, but it is not readable."
                 );
                 continue;
@@ -150,14 +150,14 @@ class Turpan
 
             if (self::isPureClassFile($nodes)) {
                 echo "\033[32m.\033[0m";
-                $results[] = new Turpan\Result(
-                    Turpan\Result::PASS,
+                $results[] = new Result(
+                    Result::PASS,
                     "{$requiredPath} is pure class file."
                 );
             } else {
                 echo "\033[31mF\033[0m";
-                $results[] = new Turpan\Result(
-                    Turpan\Result::FAIL,
+                $results[] = new Result(
+                    Result::FAIL,
                     "{$m['file']} requires \33[33m{$m['required_file']}\033[0m, but it is not pure class file.",
                     self::getDeniedNode($nodes)
                 );
@@ -170,23 +170,23 @@ class Turpan
     /**
      * report
      *
-     * @param array $results Array of Genkiroid\Turpan\Result
+     * @param array $results Array of Result
      * @return void
      */
     public static function report(array $results)
     {
-        (new Turpan\Report($results))->output();
+        (new Report($results))->output();
     }
 
     /**
-     * reportModifiedIncludeNodePointsOnlyAllowedContent
+     * run
      *
      * @param string $repoPath
      * @param string $revFrom
      * @param string $revTo
      * @return void
      */
-    public static function reportModifiedIncludeNodePointsOnlyAllowedContent($repoPath, $revFrom, $revTo)
+    public static function run($repoPath, $revFrom, $revTo)
     {
         Turpan::report(
             Turpan::test(
