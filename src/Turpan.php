@@ -8,7 +8,7 @@ use PhpParser\PrettyPrinter;
 
 class Turpan
 {
-    const VERSION = '0.2.6';
+    const VERSION = '0.2.7';
 
     const INCLUDE_STMT_PATTERN = '/^( *)(include_once|include|require_once|require)(\((?P<required_file_1>.*)\)| +(?P<required_file_2>.*));( *)$/';
 
@@ -52,7 +52,7 @@ class Turpan
                 $lines = $change->getLines();
                 foreach ($lines as $data) {
                     list($type, $line) = $data;
-                    if ($type === FileChange::LINE_ADD || $type === FileChange::LINE_REMOVE) {
+                    if ($type === FileChange::LINE_REMOVE) {
                         $isMatch = preg_match(Turpan::INCLUDE_STMT_PATTERN, $line, $matches);
                         if (!$isMatch) { continue; }
 
@@ -179,6 +179,23 @@ class Turpan
     }
 
     /**
+     * getExitCode
+     *
+     * @param array $results Array of Turpan\Result
+     * @return int
+     */
+    public function getExitCode(array $results)
+    {
+        foreach ($results as $result) {
+            if ($result->getResult() != Result::PASS) {
+                return 1;
+            }
+        }
+
+        return 0;
+    }
+
+    /**
      * run
      *
      * @param string $repoPath
@@ -188,16 +205,20 @@ class Turpan
      */
     public static function run($repoPath, $revFrom, $revTo)
     {
-        Turpan::report(
-            Turpan::test(
-                Turpan::getRequiredFileMap(
-                    Turpan::getChangedFiles(
-                        Turpan::getRepo($repoPath),
-                        $revFrom,
-                        $revTo
-                    )
-                )
-            )
+        $results = self::test(
+                        self::getRequiredFileMap(
+                            self::getChangedFiles(
+                                self::getRepo($repoPath),
+                                $revFrom,
+                                $revTo
+                            )
+                        )
+                    );
+
+        self::report(
+            $results
         );
+
+        return self::getExitCode($results);
     }
 }

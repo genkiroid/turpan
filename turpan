@@ -1,0 +1,10 @@
+#!/usr/bin/env php
+
+<?php
+error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT);
+
+require_once dirname(__DIR__) . '/vendor/autoload.php';
+
+use Turpan\Turpan;
+
+exit(Turpan::run( dirname(__DIR__), $argv[1], $argv[2]));
