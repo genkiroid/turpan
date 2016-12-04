@@ -16,5 +16,8 @@
         "classmap": [
             "src/"
         ]
-    }
+    },
+    "bin": [
+      "turpan"
+    ]
 }
