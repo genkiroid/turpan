@@ -1,6 +1,6 @@
 {
     "name": "genkiroid/turpan",
-    "description": "Parse PHP a little.",
+    "description": "Turpan will check that whether deletion of PHP require statemants is safe.",
     "require": {
         "gitonomy/gitlib": "~1.0",
         "nikic/php-parser": "~2.1"
