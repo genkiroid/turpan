@@ -29,7 +29,7 @@ class Turpan
      * @param Gitonomy\Git\Repository $repo
      * @param string $revFrom
      * @param string $revTo
-     * @return array
+     * @return Gitonomy\Git\Diff\File[]
      */
     public static function getChangedFiles(Repository $repo, $revFrom, $revTo)
     {
@@ -56,7 +56,7 @@ class Turpan
                         $isMatch = preg_match(Turpan::INCLUDE_STMT_PATTERN, $line, $matches);
                         if (!$isMatch) { continue; }
 
-                        $tmp['file'] = realpath($file->getOldName());
+                        $tmp['file'] = $file->getRepository()->getPath() . DIRECTORY_SEPARATOR . $file->getOldName();
                         $tmp['required_file'] = (!empty($matches['required_file_1'])) ? $matches['required_file_1'] : $matches['required_file_2'];
                         $tmp['required_file'] = str_replace('__FILE__', "'{$tmp['file']}'", $tmp['required_file']);
                         array_push($map, $tmp);
@@ -121,7 +121,7 @@ class Turpan
      * test
      *
      * @param array $map
-     * @return array of Result
+     * @return Turpan\Result[]
      */
     public static function test(array $map)
     {
@@ -170,7 +170,7 @@ class Turpan
     /**
      * report
      *
-     * @param array $results Array of Result
+     * @param Turpan\Result[] $results
      * @return void
      */
     public static function report(array $results)
@@ -215,9 +215,7 @@ class Turpan
                         )
                     );
 
-        self::report(
-            $results
-        );
+        self::report($results);
 
         return self::getExitCode($results);
     }

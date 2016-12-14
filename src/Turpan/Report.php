@@ -34,6 +34,7 @@ class Report
     /**
      * __construct
      *
+     * @param Turpan\Result[] $results
      * @return void
      */
     public function __construct(array $results)
