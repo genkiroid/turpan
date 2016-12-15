@@ -1,4 +1,4 @@
-Turpan will check that whether deletion of PHP require statemants is safe.
+Turpan will check that whether deletion of PHP require statements is safe.
 
 ## Usage
 
