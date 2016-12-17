@@ -3,8 +3,8 @@ namespace Turpan;
 
 class Result
 {
-    const PASS = 0;
-    const FAIL = 1;
+    const PASS  = 0;
+    const FAIL  = 1;
     const ERROR = 2;
 
     /**
