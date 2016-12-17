@@ -39,7 +39,7 @@ class TurpanTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInternalType('array', $map);
         $this->assertEquals(TEST_REPO_DIR . '/index.php', $map[0]['file']);
-        $this->assertEquals("'hello.php'", $map[0]['required_file']);
+        $this->assertEquals(TEST_REPO_DIR . '/hello.php', $map[0]['required_file']);
 
         return $map;
     }

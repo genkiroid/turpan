@@ -59,6 +59,10 @@ class Turpan
                         $tmp['file'] = $file->getRepository()->getPath() . DIRECTORY_SEPARATOR . $file->getOldName();
                         $tmp['required_file'] = (!empty($matches['required_file_1'])) ? $matches['required_file_1'] : $matches['required_file_2'];
                         $tmp['required_file'] = str_replace('__FILE__', "'{$tmp['file']}'", $tmp['required_file']);
+                        $tmp['required_file'] = eval('return ' . $tmp['required_file'] . ';');
+                        if (!is_readable($tmp['required_file'])) {
+                            $tmp['required_file'] = $file->getRepository()->getPath() . DIRECTORY_SEPARATOR . $tmp['required_file'];
+                        }
                         array_push($map, $tmp);
                     }
                 }
@@ -131,12 +135,7 @@ class Turpan
         $results = [];
 
         foreach ($map as $m) {
-            if (file_exists(dirname($m['file']))) {
-                chdir(dirname($m['file']));
-            }
-
-            $requiredPath = eval('return ' . $m['required_file'] . ';');
-            if (is_readable($requiredPath) === false) {
+            if (is_readable($m['required_file']) === false) {
                 echo "\033[34mE\033[0m";
                 $results[] = new Result(
                     Result::ERROR,
@@ -145,14 +144,14 @@ class Turpan
                 continue;
             }
 
-            $requiredContent = file_get_contents($requiredPath);
+            $requiredContent = file_get_contents($m['required_file']);
             $nodes = $parser->parse($requiredContent);
 
             if (self::isPureClassFile($nodes)) {
                 echo "\033[32m.\033[0m";
                 $results[] = new Result(
                     Result::PASS,
-                    "{$requiredPath} is pure class file."
+                    "{$m['required_file']} is pure class file."
                 );
             } else {
                 echo "\033[31mF\033[0m";
