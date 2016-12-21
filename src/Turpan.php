@@ -112,7 +112,7 @@ class Turpan
      * @param array $nodes Array of PhpParser\Node
      * @return string
      */
-    protected function getDeniedNode(array $nodes)
+    protected static function getDeniedNode(array $nodes)
     {
         foreach ($nodes as $node) {
             if (self::isAllowedNode($node)) { continue; }
