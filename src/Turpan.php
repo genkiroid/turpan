@@ -77,7 +77,7 @@ class Turpan
      * @param PhpParser\Node $node
      * @return bool
      */
-    protected function isAllowedNode(\PhpParser\Node $node)
+    protected static function isAllowedNode(\PhpParser\Node $node)
     {
         switch ($node->getType()) {
         case 'Stmt_Class':
