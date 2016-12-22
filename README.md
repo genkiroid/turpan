@@ -1,3 +1,7 @@
+# Turpan
+
+[![Build Status](https://travis-ci.org/genkiroid/turpan.svg?branch=master)](https://travis-ci.org/genkiroid/turpan)
+
 Turpan will check that whether deletion of PHP require statements is safe.
 
 ## Usage
