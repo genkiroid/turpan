@@ -20,3 +20,8 @@ If you want to not display code, please set environment variable like below.
 $ TURPAN_SHOW_DETAIL=OFF vendor/bin/turpan {from rev} {to rev}
 ```
 
+If you want to ignore check, please set environment variable like below.
+
+```shell
+$ IGNORE_PATTERN=/tests/ vendor/bin/turpan {from rev} {to rev}
+```

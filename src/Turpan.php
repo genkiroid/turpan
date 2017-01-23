@@ -8,7 +8,7 @@ use PhpParser\PrettyPrinter;
 
 class Turpan
 {
-    const VERSION = '0.3.0';
+    const VERSION = '0.3.1';
 
     const INCLUDE_STMT_PATTERN = '/^( *)(include_once|include|require_once|require)(\((?P<required_file_1>.*)\)| +(?P<required_file_2>.*));( *)$/';
 
@@ -133,8 +133,12 @@ class Turpan
 
         $parser = (new ParserFactory)->create(ParserFactory::ONLY_PHP5);
         $results = [];
+        $ignorePattern = getenv('IGNORE_PATTERN');
 
         foreach ($map as $m) {
+            if ($ignorePattern && preg_match($ignorePattern, $m['file'])) {
+                continue;
+            }
             if (is_readable($m['required_file']) === false) {
                 echo "\033[34mE\033[0m";
                 $results[] = new Result(
