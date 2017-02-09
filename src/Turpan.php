@@ -8,7 +8,7 @@ use PhpParser\PrettyPrinter;
 
 class Turpan
 {
-    const VERSION = '0.3.1';
+    const VERSION = '0.3.2';
 
     const INCLUDE_STMT_PATTERN = '/^( *)(include_once|include|require_once|require)(\((?P<required_file_1>.*)\)| +(?P<required_file_2>.*));( *)$/';
 
@@ -61,7 +61,7 @@ class Turpan
                         $tmp['required_file'] = str_replace('__FILE__', "'{$tmp['file']}'", $tmp['required_file']);
                         $tmp['required_file'] = eval('return ' . $tmp['required_file'] . ';');
                         if (!is_readable($tmp['required_file'])) {
-                            $tmp['required_file'] = $file->getRepository()->getPath() . DIRECTORY_SEPARATOR . $tmp['required_file'];
+                            $tmp['required_file'] = $file->getRepository()->getPath() . DIRECTORY_SEPARATOR . self::getDocRootDir() . $tmp['required_file'];
                         }
                         array_push($map, $tmp);
                     }
@@ -69,6 +69,18 @@ class Turpan
             }
         }
         return $map;
+    }
+
+    /**
+     * getDocRootDir
+     *
+     * @return string
+     **/
+    private static function getDocRootDir()
+    {
+        if (empty($dir = getenv('DOC_ROOT_DIR'))) { return ''; }
+
+        return trim($dir, '/') . DIRECTORY_SEPARATOR;
     }
 
     /**
