@@ -61,6 +61,12 @@ class Turpan
                         $tmp['required_file'] = str_replace('__FILE__', "'{$tmp['file']}'", $tmp['required_file']);
                         $tmp['required_file'] = eval('return ' . $tmp['required_file'] . ';');
                         if (!is_readable($tmp['required_file'])) {
+                            $try = eval('return dirname("'.$tmp['file'].'");') . $tmp['required_file'];
+                            if (is_readable($try)) {
+                                $tmp['required_file'] = $try;
+                            }
+                        }
+                        if (!is_readable($tmp['required_file'])) {
                             $tmp['required_file'] = $file->getRepository()->getPath() . DIRECTORY_SEPARATOR . self::getDocRootDir() . $tmp['required_file'];
                         }
                         array_push($map, $tmp);
