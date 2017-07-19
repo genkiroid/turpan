@@ -17,5 +17,7 @@
             <directory>tests/Turpan</directory>
         </testsuite>
     </testsuites>
-
+    <php>
+      <env name="IGNORE_PATTERN" value="/^f9367ba/" />
+    </php>
 </phpunit>

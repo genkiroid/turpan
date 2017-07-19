@@ -47,6 +47,9 @@ class Turpan
         $map = [];
 
         foreach ($files as $file) {
+            if (self::shouldIgnoreBlobIndex($file->getNewIndex())) {
+                continue;
+            }
             $changes = $file->getChanges();
             foreach ($changes as $change) {
                 $lines = $change->getLines();
@@ -75,6 +78,21 @@ class Turpan
             }
         }
         return $map;
+    }
+
+    /**
+     * shouldIgnoreBlobIndex
+     *
+     * @param string $index Blob object name
+     * @return bool
+     */
+    private static function shouldIgnoreBlobIndex($index)
+    {
+        $ignorePattern = getenv('IGNORE_PATTERN');
+        if ($ignorePattern && preg_match($ignorePattern, $index)) {
+            return true;
+        }
+        return false;
     }
 
     /**

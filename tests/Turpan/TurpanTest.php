@@ -20,8 +20,8 @@ class TurpanTest extends \PHPUnit_Framework_TestCase
     {
         $changes = Turpan::getChangedFiles(
             $this->repo,
-            '5eb841fd2abf354b76ec4aed1621180f36cfd453',
-            '51383e64e68317da1996e11764a1f4a31e6bd39f'
+            '71719ef7817047e16459d74784b2a6eb42292d17',
+            'ac051f08cad57ce38e8609a941474ccb76621dd4'
         );
 
         $this->assertInternalType('array', $changes);
@@ -78,5 +78,12 @@ class TurpanTest extends \PHPUnit_Framework_TestCase
         $exitCode = $turpan->getExitCode($results);
 
         $this->assertEquals(1, $exitCode);
+    }
+
+    public function testShouldIgnoreBlobIndex()
+    {
+        Closure::bind(function () {
+            $this->assertTrue(Turpan::shouldIgnoreBlobIndex('f9367ba'));
+        }, $this, 'Turpan\Turpan')->__invoke();
     }
 }
