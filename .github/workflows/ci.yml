@@ -17,6 +17,8 @@ jobs:
 
       - name: Run composer
         uses: php-actions/composer@v6
+        with:
+          php_version: "7.4"
 
       - name: Run tests
         uses: php-actions/phpunit@v3
